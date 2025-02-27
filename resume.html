@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 프로필 페이지</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .resume-section {
+            flex: 1;
+            background-color: #fff;
+            padding: 20px;
+            margin-right: 10px;
+            border: 2px solid #000;
+        }
+
+        .character-section {
+            flex: 2;
+            background-color: #fff;
+            padding: 20px;
+            margin: 0 10px;
+            border: 2px solid #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .character-img {
+            width: 200px; /* 이미지 크기 조정 */
+            height: auto;
+            animation: spin 8s linear infinite; /* 8초 동안 한 바퀴, 무한 반복 */
+            transform-style: preserve-3d; /* 3D 느낌 살리기 */
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotateY(0deg); /* 시작: 0도 */
+            }
+            to {
+                transform: rotateY(360deg); /* 끝: 360도 */
+            }
+        }
+
+        .inventory-section {
+            flex: 1;
+            background-color: #fff;
+            padding: 20px;
+            margin-left: 10px;
+            border: 2px solid #000;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .item-slot {
+            width: 48px;
+            height: 48px;
+            background-color: #ddd;
+            margin: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #000;
+            flex: 0 0 calc(25% - 4px); /* 4칸으로 꽉 채우기 */
+            font-size: 12px; /* 글씨 크기 줄이기 */
+            text-align: center; /* 텍스트 가운데 정렬 */
+            overflow: hidden; /* 넘치는 텍스트 숨기기 */
+            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+            text-overflow: ellipsis; /* 넘칠 경우 ...으로 표시 */
+        }
+
+        .status-bar {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .hp-bar, .mp-bar {
+            width: 200px;
+            background-color: #555;
+            border: 2px solid #000;
+            padding: 5px;
+        }
+
+        .hp-fill {
+            height: 20px;
+            background-color: #ff4444;
+            transition: width 0.3s;
+        }
+
+        .mp-fill {
+            height: 20px;
+            background-color: #4444ff;
+            transition: width 0.3s;
+        }
+
+        .intro {
+            margin: 0 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 왼쪽: 이력서 -->
+        <div class="resume-section">
+            <h2>이력서</h2>
+            <p>이름: [김호현]</p>
+            <p>나이: [29]</p>
+            <p>경력: [백수 29년차]</p>
+            <p>활동: 코인4년차 트레이더, 게임인재원 자퇴생, 블록체인 밸리 개발팀 </p>
+            <p>취미: 여행, 코인리서칭, 사용해보기, 물기 </p>
+            <p>네이밍 : 철학가, 코인쟁이, 무직 백수, 여행가, 타락한 연금술사</p>
+            <!-- 여기에 더 많은 이력서 내용을 추가할 수 있음 -->
+        </div>
+
+        <!-- 가운데: 회전하는 캐릭터 이미지 -->
+        <div class="character-section">
+            <img src="src/pengu.png" alt="캐릭터 이미지" class="character-img">
+        </div>
+
+        <!-- 오른쪽: 아이템 인벤토리 (꽉 채움) -->
+        <div class="inventory-section"> 
+            <h2>아이템 인벤토리</h2>
+            <div class="item-slot">C</div>
+            <div class="item-slot">C++</div>   
+            <div class="item-slot">JavaScript</div>
+            <div class="item-slot">Node.js</div>
+            <div class="item-slot">Solidity</div>
+            <div class="item-slot">Pinescript</div>
+            <div class="item-slot">React.js</div>
+            <div class="item-slot">Web3.js</div>
+            <div class="item-slot">hardHat</div>
+            <div class="item-slot">Win32API</div>
+            <div class="item-slot">Direct2D</div>
+            <div class="item-slot">Direct3D</div>
+            <div class="item-slot">Unity</div>
+            <div class="item-slot">Git</div>
+            <div class="item-slot">Notion</div>
+            <div class="item-slot">Arbitrum</div>   
+        </div>
+    </div>
+
+    <!-- 하단: HP/MP 바 및 소개 -->
+    <div class="status-bar">
+        <div class="hp-bar">
+            <span>HP: 100/100</span>
+            <div class="hp-fill" style="width: 100%;"></div>
+        </div>
+        <div class="mp-bar">
+            <span>MP: 80/100</span>
+            <div class="mp-fill" style="width: 80%;"></div>
+        </div>
+        <p class="intro">정답이다! 인간</p>
+    </div>
+</body>
+</html>

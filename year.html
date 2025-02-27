@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Career Timeline (BTC Style)</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .chart-container {
+            display: flex;
+            align-items: center;
+            gap: 20px; /* 차트와 버튼 사이 간격 */
+        }
+
+        canvas {
+            max-width: 800px;
+            width: 100%;
+            height: 400px;
+        }
+
+        .next-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #f7931a; /* BTC 스타일 오렌지색 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .next-button:hover {
+            background-color: #e68a00; /* 호버 시 색상 변화 */
+        }
+    </style>
+</head>
+<body>
+    <h1>나의 커리어 타임라인 (2022-2025)</h1>
+    <div class="chart-container">
+        <canvas id="timelineChart"></canvas>
+        <button class="next-button">다음으로 가기</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('timelineChart').getContext('2d');
+
+        // 커리어 타임라인 데이터
+        const careerData = [
+            { date: '2022-03', event: '첫 직장 입사', value: 10 },
+            { date: '2022-09', event: '프로젝트 완료', value: 15 },
+            { date: '2023-01', event: '승진', value: 20 },
+            { date: '2023-06', event: '새 팀 합류', value: 18 },
+            { date: '2024-04', event: '컨퍼런스 발표', value: 25 },
+            { date: '2024-11', event: '부서 이동', value: 22 }, 
+            { date: '2025-02', event: '새 프로젝트 시작', value: 28 },
+            { date: '2025-현재', event: '진행 중', value: 30 }
+        ];
+
+        // 실제 상황 데이터 (2022 고점 -> 하락 -> 2024 최고점 -> 2025 바닥)
+        const realityData = [
+            { date: '2022-03', value: 50 },  // 고점 시작
+            { date: '2022-09', value: 30 },  // 하락 중
+            { date: '2023-01', value: 10 },  // 더 하락
+            { date: '2023-06', value: -5 },  // 마이너스
+            { date: '2024-04', value: 60 },  // 최고점
+            { date: '2024-11', value: 40 },  // 하락 시작
+            { date: '2025-02', value: 20 },  // 더 하락
+            { date: '2025-현재', value: 0 }  // 바닥
+        ];
+
+        // 차트 데이터 준비
+        const labels = careerData.map(item => item.date);
+        const careerValues = careerData.map(item => item.value);
+        const careerEvents = careerData.map(item => item.event);
+        const realityValues = realityData.map(item => item.value);
+
+        // BTC 스타일 차트 생성
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: '커리어 타임라인',
+                        data: careerValues,
+                        borderColor: '#f7931a', // BTC 오렌지색
+                        borderWidth: 2,
+                        pointBackgroundColor: '#f7931a',
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: '실제 상황',
+                        data: realityValues,
+                        borderColor: '#00ccff', // 구분 위해 청록색
+                        borderWidth: 2,
+                        pointBackgroundColor: '#00ccff',
+                        pointRadius: 5,
+                        pointHoverRadius: 8,
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        title: { display: true, text: '시간', color: '#333' }
+                    },
+                    y: {
+                        title: { display: true, text: '상태', color: '#333' },
+                        beginAtZero: false, // 마이너스 값 포함
+                        suggestedMin: -10,  // 마이너스 범위 보이게
+                        suggestedMax: 70    // 최고점 고려
+                    }
+                },
+                plugins: {
+                    legend: { display: true },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if (context.dataset.label === '커리어 타임라인') {
+                                    return `${careerEvents[context.dataIndex]} (중요도: ${careerValues[context.dataIndex]})`;
+                                } else {
+                                    return `실제 상황 (값: ${realityValues[context.dataIndex]})`;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 버튼 클릭 이벤트 (예시로 alert 추가, 실제 기능은 네가 원하는 대로 수정)
+
+        document.querySelector('.next-button').addEventListener('click', function() {
+            alert('다음 페이지로 이동합니다!');
+            
+            // 여기서 원하는 동작(예: 페이지 이동, 데이터 업데이트 등)을 추가할 수 있음
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회전하는 스마트폰</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .phone {
+            width: 200px; /* 이미지 크기 조정 */
+            height: auto;
+            animation: spin 8s linear infinite; /* 8초 동안 한 바퀴, 무한 반복 */
+            transform-style: preserve-3d; /* 3D 느낌 살리기 */
+        }
+        @keyframes spin {
+            from {
+                transform: rotateY(0deg); /* 시작: 0도 */
+            }
+            to {
+                transform: rotateY(360deg); /* 끝: 360도 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <img src="src/pengu.png" alt="Smartphone" class="phone">
+</body>
+</html>

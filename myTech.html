@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fill the Beaker</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            position: relative;
+            width: 800px;
+            height: 500px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* 비커 스타일 */
+        .beaker {
+            position: relative;
+            width: 200px;
+            height: 300px;
+            border: 3px solid #333;
+            border-radius: 0 0 20px 20px;
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .water {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 0%; /* 처음엔 비어 있음 */
+            background: #00b7ff;
+            transition: height 0.5s ease;
+        }
+
+        /* 스택 카드 스타일 */
+        .stack-card {
+            position: absolute;
+            width: 100px;
+            height: 60px;
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            cursor: move;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .stack-card:hover {
+            transform: scale(1.05);
+        }
+
+        .stack-card.dragging {
+            transition: none;
+            opacity: 0.8;
+        }
+
+        /* 다음으로 가기 버튼 */
+        .next-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .next-button.show {
+            opacity: 1;
+        }
+
+        .next-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 비커 -->
+        <div class="beaker">
+            <div class="water" id="water"></div>
+        </div>
+
+        <!-- 스택 카드 -->
+        <div class="stack-card" style="top: 50px; left: 350px;" data-stack="c">C</div>
+        <div class="stack-card" style="top: 120px; left: 450px;" data-stack="cpp">C++</div>
+        <div class="stack-card" style="top: 190px; left: 350px;" data-stack="javascript">JavaScript</div>
+        <div class="stack-card" style="top: 260px; left: 450px;" data-stack="nodejs">Node.js</div>
+        <div class="stack-card" style="top: 330px; left: 350px;" data-stack="solidity">Solidity</div>
+
+        <!-- 다음으로 가기 버튼 -->
+        <button class="next-button" onclick="window.location.href='blockChain.html'">다음으로 가기</button>
+    </div>
+
+    <script>
+        const cards = document.querySelectorAll('.stack-card');
+        let draggedCard = null;
+        let offsetX = 0;
+        let offsetY = 0;
+        let filledCount = 0;
+        const totalStacks = 5; // 총 스택 개수
+
+        cards.forEach(card => {
+            card.addEventListener('mousedown', startDrag);
+            card.addEventListener('touchstart', startDrag);
+        });
+
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', drop);
+        document.addEventListener('touchmove', drag, { passive: false });
+        document.addEventListener('touchend', drop);
+
+        function startDrag(e) {
+            draggedCard = e.target;
+            draggedCard.classList.add('dragging');
+            draggedCard.style.zIndex = 1000;
+
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+            const rect = draggedCard.getBoundingClientRect();
+            const containerRect = document.querySelector('.container').getBoundingClientRect();
+
+            offsetX = clientX - rect.left;
+            offsetY = clientY - rect.top;
+
+            draggedCard.style.left = `${rect.left - containerRect.left}px`;
+            draggedCard.style.top = `${rect.top - containerRect.top}px`;
+        }
+
+        function drag(e) {
+            if (draggedCard) {
+                e.preventDefault();
+
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                const containerRect = document.querySelector('.container').getBoundingClientRect();
+
+                draggedCard.style.left = `${clientX - offsetX - containerRect.left}px`;
+                draggedCard.style.top = `${clientY - offsetY - containerRect.top}px`;
+            }
+        }
+
+        function drop(e) {
+            if (draggedCard) {
+                draggedCard.classList.remove('dragging');
+                const beaker = document.querySelector('.beaker');
+                const beakerRect = beaker.getBoundingClientRect();
+                const cardRect = draggedCard.getBoundingClientRect();
+
+                // 비커 영역 안에 들어왔는지 체크
+                if (
+                    cardRect.left >= beakerRect.left - 20 &&
+                    cardRect.right <= beakerRect.right + 20 &&
+                    cardRect.top >= beakerRect.top - 20 &&
+                    cardRect.bottom <= beakerRect.bottom + 20
+                ) {
+                    draggedCard.style.display = 'none'; // 카드 숨기기
+                    filledCount++;
+                    updateWaterLevel();
+                }
+
+                draggedCard.style.zIndex = 0;
+                draggedCard = null;
+            }
+        }
+
+        function updateWaterLevel() {
+            const water = document.getElementById('water');
+            const percentage = (filledCount / totalStacks) * 100; // 비커 채워지는 비율
+            water.style.height = `${percentage}%`;
+
+            if (filledCount === totalStacks) {
+                document.querySelector('.next-button').classList.add('show'); // 비커가 꽉 차면 버튼 표시
+            }
+        }
+    </script>
+</body>
+</html>

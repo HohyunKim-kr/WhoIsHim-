@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain to Fully Connected Global Nodes</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            position: relative;
+            width: 900px;
+            height: 400px;
+        }
+
+        .blockchain-block {
+            position: absolute;
+            width: 150px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #00ffcc;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #00ffcc;
+            box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .blockchain-block.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .blockchain-block.connected {
+            border-left: 5px solid #00ffcc;
+        }
+
+        .neon-glow {
+            animation: neonPulse 2s infinite alternate;
+        }
+
+        @keyframes neonPulse {
+            from { box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc; }
+            to { box-shadow: 0 0 20px #00ffcc, 0 0 30px #00ffcc; }
+        }
+
+        .blink {
+            animation: blinkEffect 0.5s infinite;
+        }
+
+        @keyframes blinkEffect {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .connection-line {
+            position: absolute;
+            height: 5px;
+            background: #00ffcc;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .earth {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, #1e90ff 20%, #000080 70%);
+            border-radius: 50%;
+            top: 50px;
+            left: 300px;
+            opacity: 0;
+            transition: opacity 1s ease, transform 1s ease, width 1s ease, height 1s ease;
+            box-shadow: 0 0 20px rgba(30, 144, 255, 0.5);
+        }
+
+        .earth.active {
+            opacity: 1;
+        }
+
+        .earth.eye {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #00ffcc 20%, #000 70%);
+            box-shadow: 0 0 10px #00ffcc;
+        }
+
+        .node {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #00ffcc;
+            border-radius: 50%;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 1s ease, width 1s ease, height 1s ease;
+        }
+
+        .node.active {
+            opacity: 1;
+        }
+
+        .node.eye {
+            width: 5px;
+            height: 5px;
+        }
+
+        .node-line {
+            position: absolute;
+            background: #00ffcc;
+            height: 2px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container { width: 600px; height: 300px; }
+            .blockchain-block { width: 120px; height: 80px; font-size: 16px; }
+            .earth { width: 200px; height: 200px; top: 50px; left: 200px; }
+        }
+
+        @media (max-width: 480px) {
+            .container { width: 300px; height: 200px; }
+            .blockchain-block { width: 90px; height: 60px; font-size: 14px; }
+            .earth { width: 150px; height: 150px; top: 25px; left: 75px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="blockchain-block" id="block1" style="top: 150px; left: 50px;">Block 1</div>
+        <div class="blockchain-block" id="block2" style="top: 150px; left: 250px;">Block 2</div>
+        <div class="blockchain-block" id="block3" style="top: 150px; left: 450px;">Block 3</div>
+        <div class="blockchain-block" id="block4" style="top: 150px; left: 650px;">Block 4</div>
+        <div class="connection-line" id="line1" style="top: 200px; left: 200px; width: 50px;"></div>
+        <div class="connection-line" id="line2" style="top: 200px; left: 400px; width: 50px;"></div>
+        <div class="connection-line" id="line3" style="top: 200px; left: 600px; width: 50px;"></div>
+        <div class="earth" id="earth"></div>
+    </div>
+
+    <script>
+        const blocks = document.querySelectorAll('.blockchain-block');
+        const lines = document.querySelectorAll('.connection-line');
+        const container = document.querySelector('.container');
+        const earth = document.getElementById('earth');
+
+        function animateBlockchain(index = 0) {
+            if (index >= blocks.length) {
+                setTimeout(mergeBlocks, 1000);
+                return;
+            }
+
+            const block = blocks[index];
+            const line = lines[index - 1];
+
+            setTimeout(() => {
+                block.classList.add('active', 'neon-glow');
+                block.style.transform = `translateY(0)`;
+
+                if (index > 0) {
+                    block.classList.add('connected');
+                    line.style.width = '50px';
+                    line.style.opacity = '0.5';
+                }
+
+                animateBlockchain(index + 1);
+            }, 1000 * index);
+        }
+
+        function mergeBlocks() {
+            blocks.forEach(block => {
+                block.style.transition = 'all 1s ease';
+                block.style.left = '425px';
+                block.style.top = '175px';
+                block.style.width = '20px';
+                block.style.height = '20px';
+                block.style.borderRadius = '50%';
+                block.style.fontSize = '0';
+            });
+
+            setTimeout(() => {
+                blocks.forEach(block => block.remove());
+                lines.forEach(line => line.remove());
+                showGlobalNodes();
+            }, 1000);
+        }
+
+        function showGlobalNodes() {
+            earth.classList.add('active');
+
+            const nodes = [];
+            const earthCenterX = 450;
+            const earthCenterY = 200;
+            const radius = 120;
+            const nodeCount = 7;
+
+            for (let i = 0; i < nodeCount; i++) {
+                const angle = (2 * Math.PI / nodeCount) * i;
+                const x = earthCenterX + radius * Math.cos(angle);
+                const y = earthCenterY + radius * Math.sin(angle);
+                const node = document.createElement('div');
+                node.classList.add('node');
+                node.style.left = `${x - 10}px`;
+                node.style.top = `${y - 10}px`;
+                container.appendChild(node);
+                nodes.push({ element: node, x, y });
+            }
+
+            const nodeLines = [];
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const start = nodes[i];
+                    const end = nodes[j];
+                    const line = document.createElement('div');
+                    line.classList.add('node-line');
+                    const length = Math.sqrt((end.x - start.x) ** 2 + (end.y - start.y) ** 2);
+                    const angle = Math.atan2(end.y - start.y, end.x - start.x) * 180 / Math.PI;
+                    line.style.width = `${length}px`;
+                    line.style.left = `${start.x}px`;
+                    line.style.top = `${start.y}px`;
+                    line.style.transform = `rotate(${angle}deg)`;
+                    line.style.transformOrigin = '0 0';
+                    container.appendChild(line);
+                    nodeLines.push(line);
+                }
+            }
+
+            nodes.forEach((node, index) => {
+                setTimeout(() => {
+                    node.element.classList.add('active');
+                }, 500 * index);
+            });
+
+            nodeLines.forEach((line, index) => {
+                setTimeout(() => {
+                    line.style.opacity = '0.5';
+                    if (index === nodeLines.length - 1) {
+                        setTimeout(() => {
+                            // 노드 깜빡이기
+                            nodes.forEach(node => {
+                                node.element.classList.add('blink');
+                            });
+                            // 지구와 노드 축소 및 눈동자 스타일 적용
+                            setTimeout(() => {  
+                                earth.classList.add('eye');
+                                nodes.forEach(node => {
+                                    node.element.classList.add('eye');
+                                    node.element.style.left = `${earthCenterX - 2.5}px`; // 눈동자 중심으로 이동
+                                    node.element.style.top = `${earthCenterY - 2.5}px`;
+                                });
+                                // 페이지 이동
+                                setTimeout(() => {
+                                    window.location.href = 'year.html'; // 다음 페이지로 이동
+                                }, 1000); // 축소 후 1초 대기
+                            }, 2000); // 깜빡이기 2초 후 축소
+                        }, 500); // 연결선 완료 후 0.5초 대기
+                    }
+                }, 500 * (index + nodes.length));
+            });
+        }
+
+        animateBlockchain();
+
+        window.addEventListener('resize', () => {
+            blocks.forEach((block, index) => {
+                block.style.top = '150px';
+                block.style.left = `${50 + index * 200}px`;
+            });
+            lines.forEach((line, index) => {
+                line.style.top = '200px';
+                line.style.left = `${200 + index * 200}px`;
+                line.style.width = '50px';
+            });
+        });
+    </script>
+</body>
+</html>

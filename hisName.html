@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Name Puzzle</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* 색종이 조각이 화면 밖으로 안 나가게 */
+        }
+
+        .container {
+            position: relative;
+            width: 600px;
+            height: 200px;
+        }
+
+        .puzzle-piece {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            font-weight: bold;
+            color: #333;
+            cursor: move;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .puzzle-piece:hover {
+            transform: scale(1.05);
+        }
+
+        .puzzle-piece.dragging {
+            transition: none;
+        }
+
+        .drop-zone {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #666;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .success {
+            position: absolute;
+            top: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 24px;
+            color: #28a745;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .success.show {
+            opacity: 1;
+        }
+
+        h1 {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 36px;
+            color: #333;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+            margin: 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+        }
+
+        .next-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .next-button.show {
+            opacity: 1;
+        }
+
+        .next-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 빵빠레 효과 스타일 */
+        .celebration {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ff0000; /* 기본 빨간색, 아래에서 랜덤 색상 적용 */
+            opacity: 0.8;
+            animation: fall 3s linear infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>호현의 블로그</h1>
+    <div class="container">
+        <!-- Drop Zones -->
+        <div class="drop-zone" style="left: 0px;" data-letter="H"></div>
+        <div class="drop-zone" style="left: 100px;" data-letter="O"></div>
+        <div class="drop-zone" style="left: 200px;" data-letter="H"></div>
+        <div class="drop-zone" style="left: 300px;" data-letter="Y"></div>
+        <div class="drop-zone" style="left: 400px;" data-letter="U"></div>
+        <div class="drop-zone" style="left: 500px;" data-letter="N"></div>
+
+        <!-- Puzzle Pieces -->
+        <div class="puzzle-piece" style="top: 20px; left: 50px;" data-letter="H">H</div>
+        <div class="puzzle-piece" style="top: 20px; left: 250px;" data-letter="O">O</div>
+        <div class="puzzle-piece" style="top: 120px; left: 150px;" data-letter="H">H</div>
+        <div class="puzzle-piece" style="top: 120px; left: 350px;" data-letter="Y">Y</div>
+        <div class="puzzle-piece" style="top: 20px; left: 450px;" data-letter="U">U</div>
+        <div class="puzzle-piece" style="top: 120px; left: 50px;" data-letter="N">N</div>
+
+        <!-- Success Message -->
+        <div class="success">완성! HOHYUN</div>
+
+        <!-- 다음으로 가기 버튼 -->
+        <button class="next-button" onclick="window.location.href='next.html'">다음으로 가기</button>
+
+        <!-- 빵빠레 효과 컨테이너 -->
+        <div class="celebration" id="celebration"></div>
+    </div>
+
+    <script>
+        const pieces = document.querySelectorAll('.puzzle-piece');
+        let draggedPiece = null;
+        let offsetX = 0;
+        let offsetY = 0;
+
+        pieces.forEach(piece => {
+            piece.addEventListener('mousedown', startDrag);
+            piece.addEventListener('touchstart', startDrag);
+        });
+
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', drop);
+        document.addEventListener('touchmove', drag, { passive: false });
+        document.addEventListener('touchend', drop);
+
+        function startDrag(e) {
+            draggedPiece = e.target;
+            draggedPiece.classList.add('dragging');
+            draggedPiece.style.zIndex = 1000;
+
+            const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+            const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+            const rect = draggedPiece.getBoundingClientRect();
+            const containerRect = document.querySelector('.container').getBoundingClientRect();
+
+            offsetX = clientX - rect.left;
+            offsetY = clientY - rect.top;
+
+            draggedPiece.style.left = `${rect.left - containerRect.left}px`;
+            draggedPiece.style.top = `${rect.top - containerRect.top}px`;
+        }
+
+        function drag(e) {
+            if (draggedPiece) {
+                e.preventDefault();
+
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+
+                const containerRect = document.querySelector('.container').getBoundingClientRect();
+
+                draggedPiece.style.left = `${clientX - offsetX - containerRect.left}px`;
+                draggedPiece.style.top = `${clientY - offsetY - containerRect.top}px`;
+            }
+        }
+
+        function drop(e) {
+            if (draggedPiece) {
+                draggedPiece.classList.remove('dragging');
+                const dropZones = document.querySelectorAll('.drop-zone');
+                let snapped = false;
+
+                dropZones.forEach(zone => {
+                    const zoneRect = zone.getBoundingClientRect();
+                    const pieceRect = draggedPiece.getBoundingClientRect();
+
+                    if (
+                        pieceRect.left >= zoneRect.left - 20 &&
+                        pieceRect.right <= zoneRect.right + 20 &&
+                        pieceRect.top >= zoneRect.top - 20 &&
+                        pieceRect.bottom <= zoneRect.bottom + 20 &&
+                        zone.dataset.letter === draggedPiece.dataset.letter
+                    ) {
+                        draggedPiece.style.left = `${zone.offsetLeft}px`;
+                        draggedPiece.style.top = `${zone.offsetTop}px`;
+                        draggedPiece.style.cursor = 'default';
+                        draggedPiece.removeEventListener('mousedown', startDrag);
+                        draggedPiece.removeEventListener('touchstart', startDrag);
+                        snapped = true;
+                    }
+                });
+
+                if (!snapped) {
+                    draggedPiece.style.left = `${draggedPiece.dataset.originalX}px`;
+                    draggedPiece.style.top = `${draggedPiece.dataset.originalY}px`;
+                }
+
+                draggedPiece.style.zIndex = 0;
+                draggedPiece = null;
+
+                checkCompletion();
+            }
+        }
+
+        function checkCompletion() {
+            const pieces = document.querySelectorAll('.puzzle-piece');
+            const allSnapped = Array.from(pieces).every(piece => piece.style.cursor === 'default');
+            if (allSnapped) {
+                document.querySelector('.success').classList.add('show');
+                document.querySelector('.next-button').classList.add('show');
+                triggerConfetti(); // 빵빠레 효과 실행
+            }
+        }
+
+        // 빵빠레(색종이) 효과 함수
+        function triggerConfetti() {
+            const celebration = document.getElementById('celebration');
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+
+            for (let i = 0; i < 50; i++) { // 50개의 색종이 조각 생성
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = `${Math.random() * 100}vw`; // 화면 너비 내 랜덤 위치
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]; // 랜덤 색상
+                confetti.style.animationDelay = `${Math.random() * 2}s`; // 떨어지는 시간 랜덤화
+                celebration.appendChild(confetti);
+
+                // 애니메이션 끝난 후 제거
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000); // 3초 후 제거
+            }
+        }
+
+        pieces.forEach(piece => {
+            piece.dataset.originalX = piece.style.left;
+            piece.dataset.originalY = piece.style.top;
+        });
+    </script>
+</body>
+</html>
