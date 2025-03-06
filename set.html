@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>육각형 회전 포켓몬 카드 갤러리 - 축 안정화</title>
+    <style>
+        /* 페이지 기본 스타일 */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #222;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 갤러리 컨테이너 */
+        .gallery {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            transform-style: preserve-3d;
+            animation: rotate 20s infinite linear;
+            perspective: 1000px;
+        }
+
+        /* 카드 스타일 */
+        .card {
+            position: absolute;
+            width: 200px;
+            height: 300px;
+            background: linear-gradient(135deg, #ffeb3b, #f44336, #2196f3);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        /* 반짝이는 효과 */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 0.8),
+                rgba(255, 255, 255, 0)
+            );
+            transform: rotate(30deg);
+            animation: shine 2s infinite linear;
+        }
+
+        /* 카드 내용 */
+        .card-content {
+            position: relative;
+            z-index: 1;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        /* 육각형 배치 - 기본 위치 명확히 */
+        .card:nth-child(1) { transform: rotateY(0deg) translateZ(300px); }
+        .card:nth-child(2) { transform: rotateY(60deg) translateZ(300px); }
+        .card:nth-child(3) { transform: rotateY(120deg) translateZ(300px); }
+        .card:nth-child(4) { transform: rotateY(180deg) translateZ(300px); }
+        .card:nth-child(5) { transform: rotateY(240deg) translateZ(300px); }
+        .card:nth-child(6) { transform: rotateY(300deg) translateZ(300px); }
+
+        /* 회전 애니메이션 */
+        @keyframes rotate {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+
+        /* 반짝이는 애니메이션 */
+        @keyframes shine {
+            0% { transform: translateX(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) rotate(30deg); }
+        }
+
+        /* 호버 효과 - 축 유지하면서 조정 */
+        .card:hover {
+            transform: inherit scale(1.2); /* 기본 transform 유지하고 scale만 추가 */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="gallery">
+        <div class="card">
+            <div class="card-content">Pikachu ★</div>
+        </div>
+        <div class="card">
+            <div class="card-content">Charizard ★</div>
+        </div>
+        <div class="card">
+            <div class="card-content">Bulbasaur ★</div>
+        </div>
+        <div class="card">
+            <div class="card-content">Squirtle ★</div>
+        </div>
+        <div class="card">
+            <div class="card-content">Mewtwo ★</div>
+        </div>
+        <div class="card">
+            <div class="card-content">Gengar ★</div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>아티스트의 팔레트</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 1.5s ease;
+    }
+    
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: none; /* 기본 마우스 커서 숨김 */
+    }
+    
+    .header {
+      text-align: center;
+      margin: 30px 0;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: #666;
+      font-style: italic;
+    }
+    
+    .palette-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 90%;
+      max-width: 800px;
+    }
+    
+    .palette {
+      background-color: #523f2c;
+      border-radius: 50% 50% 5px 5px;
+      width: 500px;
+      height: 250px;
+      position: relative;
+      margin-bottom: 100px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .paint-spots {
+      display: flex;
+      justify-content: space-around;
+      width: 80%;
+      position: absolute;
+      top: 20%;
+      left: 10%;
+    }
+    
+    .paint {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.3s ease;
+      z-index: 2;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+    }
+    
+    .paint:hover {
+      transform: scale(1.1);
+    }
+    
+    .paint::after {
+      content: '';
+      position: absolute;
+      width: 30px;
+      height: 100px;
+      top: 100%;
+      left: 10px;
+      border-radius: 0 0 10px 10px;
+      z-index: 1;
+      clip-path: polygon(0 0, 100% 0, 90% 100%, 10% 100%);
+      animation: drip 5s infinite ease-in-out;
+    }
+    
+    .paint:nth-child(2n)::after {
+      animation-delay: 1s;
+    }
+    
+    .paint:nth-child(3n)::after {
+      animation-delay: 2s;
+    }
+    
+    @keyframes drip {
+      0% {
+        height: 0;
+        opacity: 0;
+      }
+      20% {
+        height: 100px;
+        opacity: 1;
+      }
+      80% {
+        height: 120px;
+        opacity: 0.7;
+      }
+      100% {
+        height: 150px;
+        opacity: 0;
+      }
+    }
+    
+    #red {
+      background-color: #e74c3c;
+    }
+    
+    #red::after {
+      background-color: #e74c3c;
+    }
+    
+    #orange {
+      background-color: #e67e22;
+    }
+    
+    #orange::after {
+      background-color: #e67e22;
+    }
+    
+    #yellow {
+      background-color: #f1c40f;
+    }
+    
+    #yellow::after {
+      background-color: #f1c40f;
+    }
+    
+    #green {
+      background-color: #2ecc71;
+    }
+    
+    #green::after {
+      background-color: #2ecc71;
+    }
+    
+    #blue {
+      background-color: #3498db;
+    }
+    
+    #blue::after {
+      background-color: #3498db;
+    }
+    
+    #purple {
+      background-color: #9b59b6;
+    }
+    
+    #purple::after {
+      background-color: #9b59b6;
+    }
+    
+    .brush {
+      position: fixed;
+      width: 20px;
+      height: 150px;
+      background-color: #8B4513;
+      border-radius: 2px;
+      transform: rotate(-20deg);
+      pointer-events: none;
+      z-index: 10;
+    }
+    
+    .brush::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -5px;
+      width: 30px;
+      height: 40px;
+      background-color: #ddd;
+      border-radius: 5px 5px 0 0;
+    }
+    
+    .brush::after {
+      content: '';
+      position: absolute;
+      top: -12px;
+      left: -5px;
+      width: 30px;
+      height: 5px;
+      background-color: silver;
+      border-radius: 5px;
+    }
+    
+    .info {
+      margin-top: 50px;
+      text-align: center;
+      color: #333;
+      font-style: italic;
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>아티스트의 팔레트</h1>
+    <p class="subtitle">색상을 클릭하여 영감을 얻으세요</p>
+  </div>
+  
+  <div class="palette-container">
+    <div class="palette">
+      <div class="paint-spots">
+        <div class="paint" id="red" onclick="changeBackground('#e74c3c')"></div>
+        <div class="paint" id="orange" onclick="changeBackground('#e67e22')"></div>
+        <div class="paint" id="yellow" onclick="changeBackground('#f1c40f')"></div>
+        <div class="paint" id="green" onclick="changeBackground('#2ecc71')"></div>
+        <div class="paint" id="blue" onclick="changeBackground('#3498db')"></div>
+        <div class="paint" id="purple" onclick="changeBackground('#9b59b6')"></div>
+      </div>
+      <div class="brush"></div>
+    </div>
+    
+    <div class="info">
+      색상을 클릭하면 배경이 변합니다. 당신만의 예술적 감성을 표현해보세요.
+    </div>
+  </div>
+
+  <script>
+    function changeBackground(color) {
+      document.body.style.backgroundColor = color;
+      
+      const isDark = isColorDark(color);
+      document.querySelector('h1').style.color = isDark ? '#fff' : '#333';
+      document.querySelector('.subtitle').style.color = isDark ? '#ddd' : '#666';
+      document.querySelector('.info').style.color = isDark ? '#fff' : '#333';
+    }
+    
+    function isColorDark(color) {
+      const r = parseInt(color.substr(1, 2), 16);
+      const g = parseInt(color.substr(3, 2), 16);
+      const b = parseInt(color.substr(5, 2), 16);
+      const brightness = (r * 0.299 + g * 0.587 + b * 0.114) / 255;
+      return brightness < 0.5;
+    }
+
+    const brush = document.querySelector('.brush');
+    document.addEventListener('mousemove', (e) => {
+      brush.style.left = `${e.clientX}px`;
+      brush.style.top = `${e.clientY}px`;
+    });
+  </script>
+</body>
+</html>

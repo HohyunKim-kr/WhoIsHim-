@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>작가 페이지</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: background-color 1.5s ease, opacity 0.3s ease;
+    }
+    
+    body {
+      font-family: 'Courier New', monospace;
+      background-color: #f9f9f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    .header {
+      text-align: center;
+      margin: 30px 0;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+      color: #333;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: #666;
+      font-style: italic;
+    }
+    
+    .gallery-container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 20px;
+      background-color: #523f2c; /* 팔레트 배경색으로 변경 */
+      border-radius: 10px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    
+    .main-artwork, .artist-info, .other-artworks {
+      border: 2px solid #333;
+      background-color: #f9f9f9;
+      padding: 10px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+      border-radius: 5px;
+    }
+    
+    .main-artwork {
+      grid-row: 1;
+      grid-column: 1;
+      height: 300px;
+      background-color: #e74c3c; /* 빨간색 */
+    }
+    
+    .artist-info {
+      grid-row: 1;
+      grid-column: 2;
+      height: 300px;
+      overflow-y: auto;
+      background-color: #3498db; /* 파란색 */
+      color: #fff;
+    }
+    
+    .other-artworks {
+      grid-row: 2;
+      grid-column: 1 / span 2;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      height: 200px;
+    }
+    
+    .artwork {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 5px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+    
+    .artwork:nth-child(1) { background-color: #e67e22; } /* 주황색 */
+    .artwork:nth-child(2) { background-color: #f1c40f; } /* 노란색 */
+    .artwork:nth-child(3) { background-color: #2ecc71; } /* 초록색 */
+    .artwork:nth-child(4) { background-color: #9b59b6; } /* 보라색 */
+    
+    .artwork::before {
+      content: '작품 이미지';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: #fff;
+      text-align: center;
+      transition: opacity 0.3s ease;
+      opacity: 0.7;
+    }
+    
+    .artwork:hover::before {
+      opacity: 1;
+    }
+    
+    .artwork::after {
+      content: '작품 설명 보기';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-size: 1rem;
+      background-color: rgba(0,0,0,0.5);
+      padding: 10px 20px;
+      border-radius: 5px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .artwork:hover::after {
+      opacity: 1;
+    }
+    
+    .description {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      z-index: 100;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      color: #333;
+    }
+    
+    /* 호버 시 설명 표시 */
+    #main-artwork:hover ~ #description-main,
+    #other1:hover ~ #description-other1,
+    #other2:hover ~ #description-other2,
+    #other3:hover ~ #description-other3,
+    #other4:hover ~ #description-other4 {
+      display: block;
+    }
+    
+    .artist-info::before {
+      content: '작가: 김예술\n나이: 35세\n설명: 현대 미술 작가, 색채를 통해 감정을 표현';
+      white-space: pre-wrap;
+      color: #fff;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>작가의 갤러리</h1>
+    <p class="subtitle">작가의 작품과 이야기를 만나보세요</p>
+  </div>
+  
+  <div class="gallery-container">
+    <div class="main-artwork" id="main-artwork"></div>
+    <div class="artist-info"></div>
+    <div class="other-artworks">
+      <div class="artwork" id="other1"></div>
+      <div class="artwork" id="other2"></div>
+      <div class="artwork" id="other3"></div>
+      <div class="artwork" id="other4"></div>
+    </div>
+  </div>
+
+  <!-- 설명 팝업들 (호버 시 표시) -->
+  <div class="description" id="description-main">
+    <p>대표작 설명: 이 작품은 작가의 주요 테마인 색채 조화를 통해 감정을 표현한 대표작입니다.</p>
+  </div>
+  <div class="description" id="description-other1">
+    <p>작품 1 설명: 이 작품은 자연의 색상에서 영감을 받아 제작되었습니다.</p>
+  </div>
+  <div class="description" id="description-other2">
+    <p>작품 2 설명: 추상적인 표현으로 현대 미술의 방향성을 제시합니다.</p>
+  </div>
+  <div class="description" id="description-other3">
+    <p>작품 3 설명: 빛과 그림자의 대비를 통해 깊이를 강조한 작품입니다.</p>
+  </div>
+  <div class="description" id="description-other4">
+    <p>작품 4 설명: 감정의 혼란을 색채로 표현한 독창적인 작품입니다.</p>
+  </div>
+</body>
+</html>

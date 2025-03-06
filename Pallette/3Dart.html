@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>모던 미술관 갤러리</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      transition: all 0.4s ease; /* 부드러운 전환 효과 */
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background-color: #f8f8f8; /* 더 밝고 부드러운 회색 배경 */
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 50px 0;
+      background-color: #1e1e2f; /* 더 깊고 차분한 검정 */
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 300;
+      margin-bottom: 20px;
+      letter-spacing: 3px;
+      text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .subtitle {
+      font-style: italic;
+      font-size: 1.4rem;
+      color: #e0e0e0;
+      opacity: 0.9;
+    }
+
+    /* 메인 갤러리 뷰 */
+    .gallery-container {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 80px 30px;
+      background: linear-gradient(135deg, #f8f8f8 0%, #d5d5d5 100%); /* 더 부드러운 그라디언트 */
+    }
+
+    .gallery-carousel {
+      display: flex;
+      flex-direction: row;
+      gap: 60px; /* 더 넉넉한 간격 */
+      width: 90%;
+      max-width: 1500px;
+      height: 85%;
+      overflow-x: auto;
+      padding: 30px 0;
+      scroll-behavior: smooth;
+    }
+
+    .artwork {
+      position: relative;
+      width: 28%;
+      max-width: 420px;
+      height: 85%;
+      background-color: #ffffff;
+      border-radius: 20px; /* 더 둥근 모서리 */
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1), 0 6px 18px rgba(0, 0, 0, 0.05);
+      padding: 35px;
+      transition: all 0.5s ease;
+      cursor: pointer;
+      opacity: 0.95;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .artwork:hover {
+      opacity: 1;
+      transform: translateY(-15px) scale(1.03);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2), 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .artwork img {
+      width: 100%;
+      height: 65%;
+      object-fit: cover;
+      border-radius: 15px;
+      border: 3px solid #f0f0f0;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+      transition: all 0.4s ease;
+    }
+
+    .artwork:hover img {
+      transform: scale(1.06);
+    }
+
+    .artwork-info {
+      margin-top: 25px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.95);
+      border-radius: 12px;
+      box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .artwork-title {
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: #2c3e50;
+      margin-bottom: 12px;
+      text-align: center;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .artwork-artist {
+      font-size: 1.3rem;
+      font-style: italic;
+      color: #7f8c8d;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .artwork-details {
+      font-size: 1.1rem;
+      color: #95a5a6;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .artwork-description {
+      font-size: 1rem;
+      color: #666;
+      line-height: 1.7;
+      max-height: 70px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      text-align: center;
+    }
+
+    /* 상세 페이지 */
+    .artwork-detail {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.95);
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+
+    .detail-content {
+      width: 90%;
+      max-width: 1100px;
+      height: 90%;
+      background-color: #ffffff;
+      border-radius: 25px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+    }
+
+    .detail-image {
+      width: 100%;
+      height: 65%;
+      object-fit: contain;
+      background-color: #1e1e2f;
+      padding: 40px;
+      border-bottom: 3px solid #f0f0f0;
+    }
+
+    .detail-info {
+      padding: 40px;
+      flex-grow: 1;
+      overflow-y: auto;
+      background-color: #fafafa;
+    }
+
+    .detail-title {
+      font-size: 2.6rem;
+      font-weight: 300;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      text-align: center;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .detail-artist {
+      font-size: 1.5rem;
+      font-style: italic;
+      color: #7f8c8d;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .detail-specs {
+      display: flex;
+      justify-content: center;
+      gap: 25px;
+      margin-bottom: 25px;
+      font-size: 1.2rem;
+      color: #95a5a6;
+    }
+
+    .detail-specs div {
+      padding: 10px 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .detail-description {
+      line-height: 1.9;
+      color: #555;
+      font-size: 1.2rem;
+      text-align: justify;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 25px;
+      right: 25px;
+      width: 50px;
+      height: 50px;
+      background-color: rgba(255, 255, 255, 0.4);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 2;
+      transition: background-color 0.4s ease, transform 0.3s ease;
+    }
+
+    .close-button:hover {
+      background-color: rgba(255, 255, 255, 0.6);
+      transform: scale(1.1);
+    }
+
+    .close-button::before,
+    .close-button::after {
+      content: '';
+      position: absolute;
+      width: 25px;
+      height: 3px;
+      background-color: #fff;
+      transition: transform 0.3s ease;
+    }
+
+    .close-button::before {
+      transform: rotate(45deg);
+    }
+
+    .close-button::after {
+      transform: rotate(-45deg);
+    }
+
+    /* 상세 페이지 트리거 */
+    #artwork1:target ~ .artwork-detail-1,
+    #artwork2:target ~ .artwork-detail-2,
+    #artwork3:target ~ .artwork-detail-3,
+    #artwork4:target ~ .artwork-detail-4,
+    #artwork5:target ~ .artwork-detail-5,
+    #artwork6:target ~ .artwork-detail-6 {
+      opacity: 1;
+      pointer-events: all;
+    }
+  </style>
+</head>
+<body>
+  <!-- 상세 페이지 앵커 -->
+  <span id="artwork1"></span>
+  <span id="artwork2"></span>
+  <span id="artwork3"></span>
+  <span id="artwork4"></span>
+  <span id="artwork5"></span>
+  <span id="artwork6"></span>
+
+  <header>
+    <h1>모던 미술관</h1>
+    <p class="subtitle">감성적인 명화 컬렉션</p>
+  </header>
+
+  <div class="gallery-container">
+    <div class="gallery-carousel">
+      <!-- 작품 1 -->
+      <div class="artwork" onclick="location.href='#artwork1'">
+        <img src="/api/placeholder/400/280" alt="모나리자">
+        <div class="artwork-info">
+          <div class="artwork-title">모나리자</div>
+          <div class="artwork-artist">레오나르도 다 빈치</div>
+          <div class="artwork-details">1503-1519 | 유화, 나무 패널</div>
+          <div class="artwork-description">르네상스 시대의 대표작으로, 신비로운 미소로 유명한 여인의 초상화입니다.</div>
+        </div>
+      </div>
+      
+      <!-- 작품 2 -->
+      <div class="artwork" onclick="location.href='#artwork2'">
+        <img src="/api/placeholder/400/280" alt="별이 빛나는 밤">
+        <div class="artwork-info">
+          <div class="artwork-title">별이 빛나는 밤</div>
+          <div class="artwork-artist">빈센트 반 고흐</div>
+          <div class="artwork-details">1889 | 유화, 캔버스</div>
+          <div class="artwork-description">격정적인 붓터치로 표현된 밤하늘과 마을의 풍경을 담은 후기 인상주의 작품입니다.</div>
+        </div>
+      </div>
+
+      <!-- 작품 3 -->
+      <div class="artwork" onclick="location.href='#artwork3'">
+        <img src="/api/placeholder/400/280" alt="진주 귀걸이를 한 소녀">
+        <div class="artwork-info">
+          <div class="artwork-title">진주 귀걸이를 한 소녀</div>
+          <div class="artwork-artist">요하네스 베르메르</div>
+          <div class="artwork-details">1665 | 유화, 캔버스</div>
+          <div class="artwork-description">명암의 대비와 진주 귀걸이의 반짝임으로 유명한 네덜란드 황금기의 걸작입니다.</div>
+        </div>
+      </div>
+
+      <!-- 작품 4 -->
+      <div class="artwork" onclick="location.href='#artwork4'">
+        <img src="/api/placeholder/400/280" alt="그랑드자트 섬의 일요일 오후">
+        <div class="artwork-info">
+          <div class="artwork-title">그랑드자트 섬의 일요일 오후</div>
+          <div class="artwork-artist">조르주 쇠라</div>
+          <div class="artwork-details">1884-1886 | 유화, 캔버스</div>
+          <div class="artwork-description">점묘법을 사용한 신인상주의의 대표작으로, 공원에서 여가를 즐기는 사람들을 묘사했습니다.</div>
+        </div>
+      </div>
+
+      <!-- 작품 5 -->
+      <div class="artwork" onclick="location.href='#artwork5'">
+        <img src="/api/placeholder/400/280" alt="비의 다리, 일본식 정원">
+        <div class="artwork-info">
+          <div class="artwork-title">비의 다리, 일본식 정원</div>
+          <div class="artwork-artist">클로드 모네</div>
+          <div class="artwork-details">1899 | 유화, 캔버스</div>
+          <div class="artwork-description">모네의 정원에 있는 연못과 다리를 그린 인상주의 작품으로, 빛과 색의 조화가 돋보입니다.</div>
+        </div>
+      </div>
+
+      <!-- 작품 6 -->
+      <div class="artwork" onclick="location.href='#artwork6'">
+        <img src="/api/placeholder/400/280" alt="절규">
+        <div class="artwork-info">
+          <div class="artwork-title">절규</div>
+          <div class="artwork-artist">에드바르드 뭉크</div>
+          <div class="artwork-details">1893 | 유화, 템페라, 파스텔, 크레용</div>
+          <div class="artwork-description">표현주의의 대표작으로, 인간의 불안과 공포를 강렬한 붓터치와 색채로 표현한 작품입니다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 작품 상세 페이지들 -->
+  <div class="artwork-detail artwork-detail-1">
+    <div class="detail-content">
+      <a href="#" class="close-button"></a>
+      <img src="/api/placeholder/800/500" alt="모나리자" class="detail-image">
+      <div class="detail-info">
+        <h2 class="detail-title">모나리자</h2>
+        <div class="detail-artist">레오나르도 다 빈치</div>
+        <div class="detail-specs">
+          <div class="detail-year">제작: 1503-1519</div>
+          <div class="detail-medium">재료: 유화, 나무 패널</div>
+          <div class="detail-size">크기: 77cm × 53cm</div>
+        </div>
+        <div class="detail-description">
+          <p>모나리자(이탈리아어: Monna Lisa)는 레오나르도 다 빈치가 그린 초상화로, 세계에서 가장 잘 알려진 예술 작품 중 하나입니다. 이 그림은 르네상스 시대 이탈리아 피렌체의 부유한 상인 프란체스코 델 조콘도의 아내 리자 게라르디니로 추정되는 여인을 그린 것입니다.</p>
+          <p>이 초상화는 '스푸마토' 기법을 사용하여 그린 것으로, 윤곽선을 흐릿하게 처리하여 더 자연스러운 느낌을 줍니다. 특히 모나리자의 미소는 보는 각도에 따라 다르게 보이는 특징이 있어 신비로운 매력을 더합니다.</p>
+          <p>현재 프랑스 파리 루브르 박물관에 전시되어 있으며, 매년 수백만 명의 방문객이 이 그림을 보기 위해 찾아옵니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="artwork-detail artwork-detail-2">
+    <div class="detail-content">
+      <a href="#" class="close-button"></a>
+      <img src="/api/placeholder/800/500" alt="별이 빛나는 밤" class="detail-image">
+      <div class="detail-info">
+        <h2 class="detail-title">별이 빛나는 밤</h2>
+        <div class="detail-artist">빈센트 반 고흐</div>
+        <div class="detail-specs">
+          <div class="detail-year">제작: 1889</div>
+          <div class="detail-medium">재료: 유화, 캔버스</div>
+          <div class="detail-size">크기: 73.7cm × 92.1cm</div>
+        </div>
+        <div class="detail-description">
+          <p>별이 빛나는 밤(네덜란드어: De sterrennacht)은 빈센트 반 고흐가 프랑스 생-레미-드-프로방스의 정신병원에 입원해 있던 1889년에 그린 작품입니다. 그는 이 그림을 병원 창문 밖 풍경을 바탕으로 하여 자신의 상상력을 더해 완성했습니다.</p>
+          <p>이 작품은 소용돌이치는 하늘, 밝게 빛나는 별들, 그리고 고요한 마을의 대비를 통해 강한 감정을 전달합니다. 소용돌이치는 붓터치와 강렬한 색채는 고흐의 내면 상태를 반영하는 것으로 해석되기도 합니다.</p>
+          <p>현재 미국 뉴욕 현대 미술관(MoMA)에 소장되어 있으며, 후기 인상주의를 대표하는 작품으로 널리 알려져 있습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 나머지 상세 페이지는 동일하므로 생략 -->
+  <div class="artwork-detail artwork-detail-3">
+    <div class="detail-content">
+      <a href="#" class="close-button"></a>
+      <img src="/api/placeholder/800/500" alt="진주 귀걸이를 한 소녀" class="detail-image">
+      <div class="detail-info">
+        <h2 class="detail-title">진주 귀걸이를 한 소녀</h2>
+        <div class="detail-artist">요하네스 베르메르</div>
+        <div class="detail-specs">
+          <div class="detail-year">제작: 1665</div>
+          <div class="detail-medium">재료: 유화, 캔버스</div>
+          <div class="detail-size">크기: 44.5cm × 39cm</div>
+        </div>
+        <div class="detail-description">
+          <p>진주 귀걸이를 한 소녀(네덜란드어: Meisje met de parel)는 네덜란드 화가 요하네스 베르메르의 대표작으로, '북유럽의 모나리자'라고도 불립니다. 이 그림은 어두운 배경 앞에 턴 자세로 진주 귀걸이를 하고 있는 소녀의 모습을 담고 있습니다.</p>
+          <p>베르메르는 빛과 색채를 절묘하게 사용하여 소녀의 얼굴과 진주 귀걸이의 반짝임을 생생하게 표현했습니다. 특히 소녀의 투명한 피부와 반짝이는 입술, 그리고 깊은 눈빛은 보는 이에게 강한 인상을 남깁니다.</p>
+          <p>이 작품은 현재 네덜란드 헤이그의 마우리츠하이스 미술관에 소장되어 있으며, 2003년에는 이 그림을 모티브로 한 소설과 영화가 제작되기도 했습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="artwork-detail artwork-detail-4">
+    <div class="detail-content">
+      <a href="#" class="close-button"></a>
+      <img src="/api/placeholder/800/500" alt="그랑드자트 섬의 일요일 오후" class="detail-image">
+      <div class="detail-info">
+        <h2 class="detail-title">그랑드자트 섬의 일요일 오후</h2>
+        <div class="detail-artist">조르주 쇠라</div>
+        <div class="detail-specs">
+          <div class="detail-year">제작: 1884-1886</div>
+          <div class="detail-medium">재료: 유화, 캔버스</div>
+          <div class="detail-size">크기: 207.6cm × 308cm</div>
+        </div>
+        <div class="detail-description">
+          <p>그랑드자트 섬의 일요일 오후(프랑스어: Un dimanche après-midi à l'Île de la Grande Jatte)는 프랑스 화가 조르주 쇠라의 대표작으로, 점묘법을 사용한 신인상주의 작품입니다.</p>
+          <p>이 그림은 파리 근교 센 강의 그랑드자트 섬에서 일요일 오후를 보내는 중산층 사람들의 모습을 그린 것입니다. 쇠라는 이 작품을 그리기 위해 2년 동안 수많은 스케치와 연구를 했으며, 과학적인 색채 이론을 바탕으로 점묘법을 발전시켰습니다.</p>
+          <p>작은 점들로 이루어진 이 그림은 멀리서 볼 때 색상이 시각적으로 혼합되어 보다 생생하고 밝은 이미지를 만듭니다. 현재 시카고 미술관에 소장되어 있으며, 신인상주의 미술의 대표작으로 평가받고 있습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="artwork-detail artwork-detail-5">
+    <div class="detail-content">
+      <a href="#" class="close-button"></a>
+      <img src="/api/placeholder/800/500" alt="비의 다리, 일본식 정원" class="detail-image">
+      <div class="detail-info">
+        <h2 class="detail-title">비의 다리, 일본식 정원</h2>
+        <div class="detail-artist">클로드 모네</div>
+        <div class="detail-specs">
+          <div class="detail-year">제작: 1899</div>
+          <div class="detail-medium">재료: 유화, 캔버스</div>
+          <div class="detail-size">크기: 89.5cm × 93.3cm</div>
+        </div>
+        <div class="detail-description">
+          <p>비의 다리, 일본식 정원(프랑스어: Le Pont japonais)은 프랑스 인상주의 화가 클로드 모네가 자신의 정원에 있는 연못과 일본식 다리를 그린 작품입니다. 모네는 지베르니에 있는 자신의 집 정원을 일본식으로 꾸미고, 이를 주제로 한 연작을 그렸습니다.</p>
+          <p>이 그림은 수련이 떠 있는 연못 위의 일본식 다리를 묘사하고 있으며, 빛의 반사와 물의 표면에 비치는 색채의 변화를 탁월하게 표현했습니다. 모네는 같은 주제로 다양한 시간대와 계절에 따라 변하는 빛과 색채의 효과를 탐구한 여러 작품을 남겼습니다.</p>
+          <p>이 작품은 인상주의의 핵심 특징인 자연광의 효과와 순간적인 인상을 포착하는 모네의 뛰어난 기술을 보여줍니다. 현재 파리 오르세 미술관에 소장되어 있습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="artwork-detail artwork-detail-6">
+    <div class="detail-content">
+      <a href="#" class="close-button"></a>
+      <img src="/api/placeholder/800/500" alt="절규" class="detail-image">
+      <div class="detail-info">
+        <h2 class="detail-title">절규</h2>
+        <div class="detail-artist">에드바르드 뭉크</div>
+        <div class="detail-specs">
+          <div class="detail-year">제작: 1893</div>
+          <div class="detail-medium">재료: 유화, 템페라, 파스텔, 크레용</div>
+          <div class="detail-size">크기: 91cm × 73.5cm</div>
+        </div>
+        <div class="detail-description">
+          <p>절규(노르웨이어: Skrik)는 노르웨이 표현주의 화가 에드바르드 뭉크의 대표작으로, 현대 미술에서 가장 널리 알려진 작품 중 하나입니다. 뭉크는 이 작품을 여러 버전으로 제작했으며, 그중 가장 유명한 것은 1893년에 그린 템페라 작품입니다.</p>
+          <p>그림은 오슬로 피오르드의 다리 위에 서 있는 왜곡된 인물이 두 손으로 얼굴을 감싸고 비명을 지르는 모습을 담고 있습니다. 뭉크는 이 작품에 대해 "자연이 울부짖는 소리를 들었다"고 말했으며, 이는 그의 개인적인 불안과 공포, 그리고 당시 시대의 불안정한 정신을 반영한다고 볼 수 있습니다.</p>
+          <p>소용돌이치는 하늘과 굽이치는 풍경, 그리고 극적인 색채는 인물의 내면적 공포와 불안을 강렬하게 표현하고 있습니다. 현재 오슬로 국립미술관에 소장되어 있습니다.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
